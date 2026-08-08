@@ -1,0 +1,83 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Provider {
+  id          String     @id @default(uuid())
+  name        String
+  apiKey      String     @unique
+  baseUrl     String
+  resources   Resource[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Resource {
+  id             String      @id @default(uuid())
+  providerId     String
+  provider       Provider    @relation(fields: [providerId], references: [id])
+  name           String
+  description    String
+  price          Float
+  schemaInput    String      // SQLite doesn't support Json, store as String
+  schemaOutput   String      
+  paymentType    String      // "exact" or "upto"
+  latency        Int         // in ms
+  qualityScore   Float       // 0-100
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  receipts       Receipt[]
+}
+
+model Agent {
+  id        String     @id @default(uuid())
+  name      String
+  apiKey    String     @unique
+  budgets   Budget[]
+  receipts  Receipt[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Budget {
+  id            String     @id @default(uuid())
+  agentId       String
+  agent         Agent      @relation(fields: [agentId], references: [id])
+  type          String     // "daily", "per_request", "per_provider"
+  providerId    String?    // Optional, if type == "per_provider"
+  limitAmount   Float
+  spentAmount   Float      @default(0)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model Transaction {
+  id             String     @id @default(uuid())
+  agentId        String
+  resourceId     String
+  status         String     // "pending", "settled", "failed"
+  quotedAmount   Float?
+  settledAmount  Float?
+  requestHash    String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+}
+
+model Receipt {
+  id             String     @id @default(uuid())
+  transactionId  String     @unique
+  agentId        String
+  agent          Agent      @relation(fields: [agentId], references: [id])
+  resourceId     String
+  resource       Resource   @relation(fields: [resourceId], references: [id])
+  cost           Float
+  inputHash      String?
+  outputHash     String?
+  timestamp      DateTime   @default(now())
+  receiptData    String     // JSON string
+}
