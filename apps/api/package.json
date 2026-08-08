@@ -1,0 +1,31 @@
+{
+  "name": "@agentmarket/api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit",
+    "db:migrate": "npx prisma migrate dev",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:studio": "npx prisma studio"
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.0.1",
+    "@fastify/sensible": "^6.0.3",
+    "@prisma/client": "^6.8.2",
+    "algosdk": "^3.6.0",
+    "dotenv": "^16.5.0",
+    "fastify": "^5.3.3",
+    "fastify-plugin": "^5.0.1",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "prisma": "^6.8.2",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}
